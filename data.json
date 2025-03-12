@@ -6,7 +6,8 @@
         "TheWorstTeam": []
     },
     "individuals": [
-        "NoTeamMember"
+        "NoTeamMember",
+        "JSONTest"
     ],
     "events": {
         "team_events": {
