@@ -1,9 +1,13 @@
 import json
 
+# Initialize data structures with correct keys
 data = {
     "teams": {},
-    "individuals": {},
-    "events": {},
+    "individuals": [],
+    "events": {
+        "team_events": {},
+        "individual_events": {}
+    }
 }
 
 # Save data to data.json
@@ -12,11 +16,23 @@ def save_data():
         json.dump(data, f, indent=4)
     print("Data saved successfully!")
 
-#Load data from data.json
+# Load data from data.json
 def load_data():
     try:
         with open("data.json", "r") as f:
-            return json.load(f)
+            loaded_data = json.load(f)
+            # Ensure the structure is correct
+            if not isinstance(loaded_data.get("teams", {}), dict):
+                loaded_data["teams"] = {}
+            if not isinstance(loaded_data.get("individuals", []), list):
+                loaded_data["individuals"] = []
+            if not isinstance(loaded_data.get("events", {}), dict):
+                loaded_data["events"] = {"team_events": {}, "individual_events": {}}
+            if not isinstance(loaded_data["events"].get("team_events", {}), dict):
+                loaded_data["events"]["team_events"] = {}
+            if not isinstance(loaded_data["events"].get("individual_events", {}), dict):
+                loaded_data["events"]["individual_events"] = {}
+            return loaded_data
     except FileNotFoundError:
         print("No data found. Starting with empty data.")
         return data
@@ -31,6 +47,15 @@ def add_team():
     else:
         data["teams"][team_name] = []
         print(f"Team {team_name} added successfully!")
+
+# Delete team
+def delete_team():
+    team_name = input("Enter Team name to delete: ")
+    if team_name in data["teams"]:
+        del data["teams"][team_name]
+        print(f"Team {team_name} deleted successfully!")
+    else:
+        print(f"Team {team_name} not found!")
 
 # Add individual
 def add_individual():
@@ -50,16 +75,86 @@ def add_individual():
             data["individuals"].append(individual_name)
             print(f"Participant {individual_name} added successfully as an individual!")
 
+# Delete individual
+def delete_individual():
+    individual_name = input("Enter Individual name to delete: ")
+    if individual_name in data["individuals"]:
+        data["individuals"].remove(individual_name)
+        print(f"Individual {individual_name} deleted successfully!")
+    else:
+        print(f"Individual {individual_name} not found!")
+
 # Add event
 def add_event():
     event_name = input("Enter Event name: ")
-    if event_name in data["events"]:
-        print("Event already exists!")
-    elif not event_name:
-        print("Event name cannot be empty!")
+    event_type = input("Is this a team event or an individual event? (team/individual): ").lower()
+    if event_type == "team":
+        if event_name in data["events"]["team_events"]:
+            print("Team event already exists!")
+        elif not event_name:
+            print("Event name cannot be empty!")
+        else:
+            data["events"]["team_events"][event_name] = []
+            print(f"Team event {event_name} added successfully!")
+    elif event_type == "individual":
+        if event_name in data["events"]["individual_events"]:
+            print("Individual event already exists!")
+        elif not event_name:
+            print("Event name cannot be empty!")
+        else:
+            data["events"]["individual_events"][event_name] = []
+            print(f"Individual event {event_name} added successfully!")
     else:
-        data["events"][event_name] = {}
-        print(f"Event {event_name} added successfully!")
+        print("Invalid event type. Please enter 'team' or 'individual'.")
+
+# Delete event
+def delete_event():
+    event_name = input("Enter Event name to delete: ")
+    event_type = input("Is this a team event or an individual event? (team/individual): ").lower()
+    if event_type == "team":
+        if event_name in data["events"]["team_events"]:
+            del data["events"]["team_events"][event_name]
+            print(f"Team event {event_name} deleted successfully!")
+        else:
+            print(f"Team event {event_name} not found!")
+    elif event_type == "individual":
+        if event_name in data["events"]["individual_events"]:
+            del data["events"]["individual_events"][event_name]
+            print(f"Individual event {event_name} deleted successfully!")
+        else:
+            print(f"Individual event {event_name} not found!")
+    else:
+        print("Invalid event type. Please enter 'team' or 'individual'.")
+
+# Assign team to event
+def assign_team_to_event():
+    team_name = input("Enter Team name: ")
+    if team_name not in data["teams"]:
+        print(f"Team {team_name} not found!")
+        return
+
+    event_name = input("Enter Event name: ")
+    if event_name not in data["events"]["team_events"]:
+        print(f"Team event {event_name} not found!")
+        return
+
+    data["events"]["team_events"][event_name].append(team_name)
+    print(f"Team {team_name} assigned to Team event {event_name} successfully!")
+
+# Assign individual to event
+def assign_individual_to_event():
+    individual_name = input("Enter Individual name: ")
+    if individual_name not in data["individuals"]:
+        print(f"Individual {individual_name} not found!")
+        return
+
+    event_name = input("Enter Event name: ")
+    if event_name not in data["events"]["individual_events"]:
+        print(f"Individual event {event_name} not found!")
+        return
+
+    data["events"]["individual_events"][event_name].append(individual_name)
+    print(f"Individual {individual_name} assigned to Individual event {event_name} successfully!")
 
 # Main program loop
 def main():
@@ -67,20 +162,65 @@ def main():
     data = load_data()
 
     while True:
-        print("\nToutnament Scoring System - EventWiz")
-        print("1. Add Team")
-        print("2. Add Individual")
-        print("3. Add Event")
+        print("\nTournament Scoring System - EventWiz")
+        print("1. Manage Teams")
+        print("2. Manage Individuals")
+        print("3. Manage Events")
         print("4. View Data")
         print("5. Save and Exit")
         choice = input("Enter your choice: ")
 
         if choice == "1":
-            add_team()
+            while True:
+                print("\nManage Teams")
+                print("1. Add Team")
+                print("2. Delete Team")
+                print("3. Assign Team to Event")
+                print("4. Back to Main Menu")
+                team_choice = input("Enter your choice: ")
+                if team_choice == "1":
+                    add_team()
+                elif team_choice == "2":
+                    delete_team()
+                elif team_choice == "3":
+                    assign_team_to_event()
+                elif team_choice == "4":
+                    break
+                else:
+                    print("Invalid choice. Please try again.")
         elif choice == "2":
-            add_individual()
+            while True:
+                print("\nManage Individuals")
+                print("1. Add Individual")
+                print("2. Delete Individual")
+                print("3. Assign Individual to Event")
+                print("4. Back to Main Menu")
+                individual_choice = input("Enter your choice: ")
+                if individual_choice == "1":
+                    add_individual()
+                elif individual_choice == "2":
+                    delete_individual()
+                elif individual_choice == "3":
+                    assign_individual_to_event()
+                elif individual_choice == "4":
+                    break
+                else:
+                    print("Invalid choice. Please try again.")
         elif choice == "3":
-            add_event()
+            while True:
+                print("\nManage Events")
+                print("1. Add Event")
+                print("2. Delete Event")
+                print("3. Back to Main Menu")
+                event_choice = input("Enter your choice: ")
+                if event_choice == "1":
+                    add_event()
+                elif event_choice == "2":
+                    delete_event()
+                elif event_choice == "3":
+                    break
+                else:
+                    print("Invalid choice. Please try again.")
         elif choice == "4":
             print("\nCurrent Data:")
             print(json.dumps(data, indent=4))
@@ -93,42 +233,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-#Old part of the code
-"""teams = []
-participants = []
-events = []
-
-# Add teams 
-teams.append(input("Enter Team 1 name: "))
-teams.append(input("Enter Team 2 name: "))
-teams.append(input("Enter Team 3 name: "))
-teams.append(input("Enter Team 4 name: "))
-
-# Add participants 
-for i in range(20):
-    participants.append(input(f"Enter Participant {i+1} name: "))
-
-# Input event results 
-event_results = {
-    "Event 1": {"Team 1": 1, "Team 2": 2},
-    "Event 2": {"Participant1": 1, "Participant2": 2},
-}
-
-# Calculate scores
-scores = {}
-for event, rankings in event_results.items():
-    for participant, rank in rankings.items():
-        if participant not in scores:
-            scores[participant] = 0
-        if rank == 1:
-            scores[participant] += 10
-        elif rank == 2:
-            scores[participant] += 7
-        elif rank == 3:
-            scores[participant] += 5
-
-# Display leaderboard
-print("Leaderboard:")
-for participant, score in sorted(scores.items(), key=lambda x: x[1], reverse=True):
-    print(f"{participant}: {score} points")"""
