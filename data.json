@@ -1,0 +1,24 @@
+{
+    "teams": {
+        "TheBestTeam": [
+            "Alex123"
+        ],
+        "TheWorstTeam": []
+    },
+    "individuals": [
+        "NoTeamMember",
+        "JSONTest"
+    ],
+    "events": {
+        "team_events": {
+            "Football": [
+                "TheBestTeam"
+            ]
+        },
+        "individual_events": {
+            "Coding": [
+                "NoTeamMember"
+            ]
+        }
+    }
+}
