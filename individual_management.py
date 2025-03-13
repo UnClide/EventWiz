@@ -1,29 +1,25 @@
 # Add individual
-def add_individual(data):
-    individual_name = input("Enter Individual name: ")
+def add_individual(data, individual_name, team_name=None):
     if not individual_name:
-        print("Individual name cannot be empty!")
+        return "Individual name cannot be empty!"
     else:
-        choice = input("Do you want to add this individual to a team? (y/n): ").lower()
-        if choice == "y":
-            team_name = input("Enter Team name: ")
+        if team_name:
             if team_name in data["teams"]:
                 data["teams"][team_name].append(individual_name)
-                print(f"Individual {individual_name} added to Team {team_name} successfully!")
+                return f"Individual {individual_name} added to Team {team_name} successfully!"
             else:
-                print(f"Team {team_name} not found!")
+                return f"Team {team_name} not found!"
         else:
             data["individuals"].append(individual_name)
-            print(f"Participant {individual_name} added successfully as an individual!")
+            return f"Participant {individual_name} added successfully as an individual!"
 
 # Delete individual
-def delete_individual(data):
-    individual_name = input("Enter Individual name to delete: ")
+def delete_individual(data, individual_name):
     if individual_name in data["individuals"]:
         data["individuals"].remove(individual_name)
-        print(f"Individual {individual_name} deleted successfully!")
+        return f"Individual {individual_name} deleted successfully!"
     else:
-        print(f"Individual {individual_name} not found!")
+        return f"Individual {individual_name} not found!"
 
 # Assign individual to event
 def assign_individual_to_event(data):
