@@ -22,16 +22,10 @@ def delete_individual(data, individual_name):
         return f"Individual {individual_name} not found!"
 
 # Assign individual to event
-def assign_individual_to_event(data):
-    individual_name = input("Enter Individual name: ")
+def assign_individual_to_event(data, individual_name, event_name):
     if individual_name not in data["individuals"]:
-        print(f"Individual {individual_name} not found!")
-        return
-
-    event_name = input("Enter Event name: ")
+        return f"Individual {individual_name} not found!"
     if event_name not in data["events"]["individual_events"]:
-        print(f"Individual event {event_name} not found!")
-        return
-
+        return f"Individual event {event_name} not found!"
     data["events"]["individual_events"][event_name].append(individual_name)
-    print(f"Individual {individual_name} assigned to Individual event {event_name} successfully!")
+    return f"Individual {individual_name} assigned to Individual event {event_name} successfully!"

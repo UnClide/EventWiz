@@ -1,24 +1,20 @@
 {
     "teams": {
-        "TheBestTeam": [
-            "Alex123"
+        "TkinterTeam": [
+            "TkinterMember"
         ],
-        "TheWorstTeam": []
+        "TheBestTeam": []
     },
     "individuals": [
-        "NoTeamMember",
-        "JSONTest"
+        "NoTeamMember"
     ],
     "events": {
         "team_events": {
-            "Football": [
-                "TheBestTeam"
-            ]
+            "TkinterEvent": [],
+            "Football": []
         },
         "individual_events": {
-            "Coding": [
-                "NoTeamMember"
-            ]
+            "Coding": []
         }
     }
 }

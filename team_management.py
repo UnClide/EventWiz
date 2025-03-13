@@ -17,16 +17,10 @@ def delete_team(data, team_name):
         return f"Team {team_name} not found!"
 
 # Assign team to event
-def assign_team_to_event(data):
-    team_name = input("Enter Team name: ")
+def assign_team_to_event(data, team_name, event_name):
     if team_name not in data["teams"]:
-        print(f"Team {team_name} not found!")
-        return
-
-    event_name = input("Enter Event name: ")
+        return f"Team {team_name} not found!"
     if event_name not in data["events"]["team_events"]:
-        print(f"Team event {event_name} not found!")
-        return
-
+        return f"Team event {event_name} not found!"
     data["events"]["team_events"][event_name].append(team_name)
-    print(f"Team {team_name} assigned to Team event {event_name} successfully!")
+    return f"Team {team_name} assigned to Team event {event_name} successfully!"
