@@ -1,41 +1,52 @@
 # Add event
-def add_event(data):
-    event_name = input("Enter Event name: ")
-    event_type = input("Is this a team event or an individual event? (team/individual): ").lower()
+def add_event(data, event_name, event_type):
     if event_type == "team":
         if event_name in data["events"]["team_events"]:
-            print("Team event already exists!")
+            return "Team event already exists!"
         elif not event_name:
-            print("Event name cannot be empty!")
+            return "Event name cannot be empty!"
         else:
             data["events"]["team_events"][event_name] = []
-            print(f"Team event {event_name} added successfully!")
+            return f"Team event {event_name} added successfully!"
     elif event_type == "individual":
         if event_name in data["events"]["individual_events"]:
-            print("Individual event already exists!")
+            return "Individual event already exists!"
         elif not event_name:
-            print("Event name cannot be empty!")
+            return "Event name cannot be empty!"
         else:
             data["events"]["individual_events"][event_name] = []
-            print(f"Individual event {event_name} added successfully!")
+            return f"Individual event {event_name} added successfully!"
     else:
-        print("Invalid event type. Please enter 'team' or 'individual'.")
+        return "Invalid event type. Please enter 'team' or 'individual'."
 
 # Delete event
-def delete_event(data):
-    event_name = input("Enter Event name to delete: ")
-    event_type = input("Is this a team event or an individual event? (team/individual): ").lower()
+def delete_event(data, event_name, event_type):
     if event_type == "team":
         if event_name in data["events"]["team_events"]:
             del data["events"]["team_events"][event_name]
-            print(f"Team event {event_name} deleted successfully!")
+            return f"Team event {event_name} deleted successfully!"
         else:
-            print(f"Team event {event_name} not found!")
+            return f"Team event {event_name} not found!"
     elif event_type == "individual":
         if event_name in data["events"]["individual_events"]:
             del data["events"]["individual_events"][event_name]
-            print(f"Individual event {event_name} deleted successfully!")
+            return f"Individual event {event_name} deleted successfully!"
         else:
-            print(f"Individual event {event_name} not found!")
+            return f"Individual event {event_name} not found!"
     else:
-        print("Invalid event type. Please enter 'team' or 'individual'.")
+        return "Invalid event type. Please enter 'team' or 'individual'."
+
+# Change event type
+def change_event_type(data, event_name, old_event_type, new_event_type):
+    if old_event_type == new_event_type:
+        return "New event type must be different from the current type!"
+    if old_event_type == "team" and event_name in data["events"]["team_events"]:
+        event_data = data["events"]["team_events"].pop(event_name)
+        data["events"]["individual_events"][event_name] = event_data
+        return f"Event {event_name} changed from Team to Individual successfully!"
+    elif old_event_type == "individual" and event_name in data["events"]["individual_events"]:
+        event_data = data["events"]["individual_events"].pop(event_name)
+        data["events"]["team_events"][event_name] = event_data
+        return f"Event {event_name} changed from Individual to Team successfully!"
+    else:
+        return f"Event {event_name} not found in {old_event_type} events!"
