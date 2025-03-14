@@ -18,8 +18,11 @@ def delete_individual(data, individual_name):
     if individual_name in data["individuals"]:
         data["individuals"].remove(individual_name)
         return f"Individual {individual_name} deleted successfully!"
-    else:
-        return f"Individual {individual_name} not found!"
+    for team, members in data["teams"].items():
+        if individual_name in members:
+            members.remove(individual_name)
+            return f"Individual {individual_name} removed from Team {team} and deleted successfully!"
+    return f"Individual {individual_name} not found!"
 
 # Assign individual to event
 def assign_individual_to_event(data, individual_name, event_name):

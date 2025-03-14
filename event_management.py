@@ -35,3 +35,18 @@ def delete_event(data, event_name, event_type):
             return f"Individual event {event_name} not found!"
     else:
         return "Invalid event type. Please enter 'team' or 'individual'."
+
+# Change event type
+def change_event_type(data, event_name, old_event_type, new_event_type):
+    if old_event_type == new_event_type:
+        return "New event type must be different from the current type!"
+    if old_event_type == "team" and event_name in data["events"]["team_events"]:
+        event_data = data["events"]["team_events"].pop(event_name)
+        data["events"]["individual_events"][event_name] = event_data
+        return f"Event {event_name} changed from Team to Individual successfully!"
+    elif old_event_type == "individual" and event_name in data["events"]["individual_events"]:
+        event_data = data["events"]["individual_events"].pop(event_name)
+        data["events"]["team_events"][event_name] = event_data
+        return f"Event {event_name} changed from Individual to Team successfully!"
+    else:
+        return f"Event {event_name} not found in {old_event_type} events!"
