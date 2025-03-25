@@ -10,9 +10,12 @@ from event_management import add_event, delete_event, change_event_type
 class TournamentApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Tournament Scoring System")
+        self.root.title("EventWiz")
         self.root.geometry("450x550")
         self.root.configure(bg="#E3E3E3")
+
+        # Restrict size of the program window
+        self.root.minsize(300, 480)
         
         # Load data from data.json
         self.data = load_data()

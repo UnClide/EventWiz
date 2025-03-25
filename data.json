@@ -1,20 +1,40 @@
 {
     "teams": {
-        "TkinterTeam": [
-            "TkinterMember"
-        ],
-        "TheBestTeam": []
+        "TheBestTeam": [],
+        "F Society": [],
+        "PythonMasters": [],
+        "LinuxTerminal": []
     },
     "individuals": [
-        "NoTeamMember"
+        "Cassie",
+        "Cerys",
+        "Ahmad",
+        "Carol",
+        "Hugh",
+        "Valerie",
+        "Tomas",
+        "Zachary",
+        "Eugene",
+        "Daisie",
+        "Calum",
+        "Trystan",
+        "Jorja",
+        "Craig",
+        "Natasha",
+        "Oliver",
+        "Harun",
+        "Saba",
+        "Laura",
+        "Catrin"
     ],
     "events": {
         "team_events": {
-            "TkinterEvent": [],
-            "Football": []
+            "Football": [],
+            "Basketball": []
         },
         "individual_events": {
-            "Coding": []
+            "Coding": [],
+            "Go Outside ": []
         }
     }
 }
