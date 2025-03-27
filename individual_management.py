@@ -32,3 +32,7 @@ def assign_individual_to_event(data, individual_name, event_name):
         return f"Individual event {event_name} not found!"
     data["events"]["individual_events"][event_name].append(individual_name)
     return f"Individual {individual_name} assigned to Individual event {event_name} successfully!"
+
+# Utility function for input validation
+def is_valid_input(input_str):
+    return bool(input_str and input_str.strip())

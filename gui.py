@@ -3,9 +3,9 @@ import tkinter as tk
 from tkinter import messagebox, StringVar, Text, simpledialog
 from tkinter import ttk
 from data_management import load_data, save_data
-from team_management import add_team, delete_team, assign_team_to_event
+from team_management import add_team, delete_team, assign_team_to_event, is_valid_input, assign_individual_to_team
 from individual_management import add_individual, delete_individual, assign_individual_to_event
-from event_management import add_event, delete_event, change_event_type
+from event_management import add_event, delete_event, change_event_type, update_event_names
 
 class TournamentApp:
     def __init__(self, root):
@@ -49,10 +49,6 @@ class TournamentApp:
             btn = ttk.Button(self.button_frame, text=text, command=command, width=25)
             btn.pack(pady=5)
 
-    def is_valid_input(self, input_str):
-        # Check if the input string is valid (not empty and not just whitespace)
-        return bool(input_str and input_str.strip())
-
     def clear_frame(self):
         for widget in self.button_frame.winfo_children():
             widget.destroy()
@@ -67,7 +63,7 @@ class TournamentApp:
         team_name = simpledialog.askstring("Add Team", "Enter Team name:")
         if team_name is None:
             return
-        if self.is_valid_input(team_name):
+        if is_valid_input(team_name):  # Updated to use the imported function
             result = add_team(self.data, team_name)
             messagebox.showinfo("Result", result)
         else:
@@ -88,7 +84,7 @@ class TournamentApp:
         def confirm_add_individual():
             individual_name = individual_name_var.get()
             team_name = team_name_var.get()
-            if not self.is_valid_input(individual_name):
+            if not is_valid_input(individual_name):  # Updated to use the imported function
                 messagebox.showerror("Error", "Individual name cannot be empty!")
                 return
             if team_name:
@@ -116,7 +112,7 @@ class TournamentApp:
 
         def confirm_event():
             event_name = event_name_var.get()
-            if not self.is_valid_input(event_name):
+            if not is_valid_input(event_name):  # Updated to use the imported function
                 messagebox.showerror("Error", "Event name cannot be empty!")
                 return
             result = add_event(self.data, event_name, event_type_var.get())
@@ -309,15 +305,11 @@ class TournamentApp:
             if not individual_name or not team_name:
                 messagebox.showerror("Error", "Both Individual and Team must be selected!")
                 return
-            if team_name in self.data["teams"]:
-                if individual_name in self.data["individuals"]:
-                    self.data["teams"][team_name].append(individual_name)
-                    self.data["individuals"].remove(individual_name)
-                    messagebox.showinfo("Success", f"Assigned {individual_name} to Team {team_name} successfully!")
-                else:
-                    messagebox.showerror("Error", f"Individual {individual_name} not found!")
+            result = assign_individual_to_team(self.data, individual_name, team_name)  # Use the imported function
+            if "successfully" in result.lower():
+                messagebox.showinfo("Success", result)
             else:
-                messagebox.showerror("Error", f"Team {team_name} not found!")
+                messagebox.showerror("Error", result)
             self.show_main_menu()
 
         ttk.Button(self.button_frame, text="Assign", command=confirm_assign_individual_to_team).pack(pady=10)
@@ -336,16 +328,11 @@ class TournamentApp:
         event_name_dropdown = ttk.Combobox(self.button_frame, textvariable=event_name_var, state="readonly")
         event_name_dropdown.pack(pady=5)
 
-        def update_event_names(*args):
+        def on_event_type_change(*args):
             event_type = event_type_var.get()
-            if event_type == "team":
-                event_name_dropdown["values"] = list(self.data["events"]["team_events"].keys())
-            elif event_type == "individual":
-                event_name_dropdown["values"] = list(self.data["events"]["individual_events"].keys())
-            else:
-                event_name_dropdown["values"] = []  # Clear dropdown if no type is selected
+            event_name_dropdown["values"] = update_event_names(self.data, event_type)  # Use the imported function
 
-        event_type_var.trace("w", update_event_names)
+        event_type_var.trace("w", on_event_type_change)
 
         ttk.Label(self.button_frame, text="Select New Event type:").pack(pady=5)
         new_event_type_var = StringVar()
