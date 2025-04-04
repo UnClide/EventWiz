@@ -1,9 +1,29 @@
 {
     "teams": {
-        "TheBestTeam": [],
-        "F Society": [],
-        "PythonMasters": [],
-        "LinuxTerminal": []
+        "TheBestTeam": [
+            "Cassie",
+            "Cerys",
+            "Ahmad",
+            "Carol"
+        ],
+        "F Society": [
+            "Hugh",
+            "Valerie",
+            "Tomas",
+            "Zachary"
+        ],
+        "PythonMasters": [
+            "Eugene",
+            "Daisie",
+            "Calum",
+            "Trystan"
+        ],
+        "LinuxTerminal": [
+            "Jorja",
+            "Craig",
+            "Natasha",
+            "Oliver"
+        ]
     },
     "individuals": [
         "Cassie",
@@ -35,6 +55,26 @@
         "individual_events": {
             "Coding": [],
             "Go Outside ": []
+        }
+    },
+    "scores": {
+        "individual_scores": {
+            "Catrin": 100,
+            "Laura": 89
+        },
+        "team_scores": {
+            "TheBestTeam": {
+                "Cassie": 100,
+                "Cerys": 100,
+                "Ahmad": 12,
+                "Carol": 67
+            },
+            "F Society": {
+                "Hugh": 100,
+                "Valerie": 89,
+                "Tomas": 86,
+                "Zachary": 55
+            }
         }
     }
 }
