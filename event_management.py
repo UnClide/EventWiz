@@ -50,3 +50,25 @@ def change_event_type(data, event_name, old_event_type, new_event_type):
         return f"Event {event_name} changed from Individual to Team successfully!"
     else:
         return f"Event {event_name} not found in {old_event_type} events!"
+
+# Utility function for input validation
+def is_valid_input(input_str):
+    return bool(input_str and input_str.strip())
+
+# Utility function to update event names based on event type
+def update_event_names(data, event_type):
+    if event_type == "team":
+        return list(data["events"]["team_events"].keys())
+    elif event_type == "individual":
+        return list(data["events"]["individual_events"].keys())
+    else:
+        return []  # Return an empty list if no valid type is selected
+
+# Remove individual from event
+def remove_individual_from_event(data, individual_name):
+    for event_type, events in data["events"].items():
+        for event_name, participants in events.items():
+            if individual_name in participants:
+                participants.remove(individual_name)
+                return f"Individual {individual_name} removed from {event_type[:-7]} event {event_name} successfully!"
+    return f"Individual {individual_name} is not assigned to any event!"
