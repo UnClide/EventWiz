@@ -2,16 +2,22 @@
 def add_individual(data, individual_name, team_name=None):
     if not individual_name:
         return "Individual name cannot be empty!"
-    else:
-        if team_name:
-            if team_name in data["teams"]:
-                data["teams"][team_name].append(individual_name)
-                return f"Individual {individual_name} added to Team {team_name} successfully!"
-            else:
-                return f"Team {team_name} not found!"
+    if individual_name in data["individuals"]:
+        return f"Individual {individual_name} already exists!"
+
+    if team_name:
+        if team_name in data["teams"]:
+            # Check if the individual is already in another team
+            for other_team, members in data["teams"].items():
+                if individual_name in members:
+                    return f"Individual {individual_name} is already in Team {other_team}. Remove them first before adding to Team {team_name}."
+            data["teams"][team_name].append(individual_name)
+            return f"Individual {individual_name} added to Team {team_name} successfully!"
         else:
-            data["individuals"].append(individual_name)
-            return f"Participant {individual_name} added successfully as an individual!"
+            return f"Team {team_name} not found!"
+    else:
+        data["individuals"].append(individual_name)
+        return f"Participant {individual_name} added successfully as an individual!"
 
 # Delete individual
 def delete_individual(data, individual_name):
