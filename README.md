@@ -16,6 +16,10 @@ This project is a **Tournament Scoring System**, developed as part of a college 
 4. **Results Display:** View stored tournament data and determine the overall winner.
 
 ## Installation
+**1. Run using executable file**
+- Download the latest version of `EventWiz.exe` from **Releases** and run it to proceed.
+
+**2. Run using Python**
 1. Install Python (if not already installed).
 2. Install required dependencies:
    ```bash
@@ -32,6 +36,4 @@ This project is a **Tournament Scoring System**, developed as part of a college 
 - **JSON** for storing tournament data.
 
 ## Future Improvements
-- Integrate scoring calculation and management system
-- Add an **export feature** to save tournament results.
 - Improve UI with better animations and visual elements.
