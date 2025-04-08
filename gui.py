@@ -1,11 +1,12 @@
 import json
 import tkinter as tk
-from tkinter import messagebox, StringVar, Text, simpledialog
+from tkinter import messagebox, StringVar, Text, simpledialog, filedialog
 from tkinter import ttk
 from data_management import load_data, save_data
 from team_management import add_team, delete_team, assign_team_to_event, is_valid_input, assign_individual_to_team, remove_individual_from_team
 from individual_management import add_individual, delete_individual, assign_individual_to_event
 from event_management import add_event, delete_event, change_event_type, update_event_names, remove_individual_from_event
+from scoring_management import assign_individual_score, assign_team_member_score, determine_winners, export_results
 
 class TournamentApp:
     def __init__(self, root):
@@ -19,6 +20,10 @@ class TournamentApp:
         
         # Load data from data.json
         self.data = load_data()
+        
+        # Ensure 'scores' key is initialized in the data structure
+        if "scores" not in self.data:
+            self.data["scores"] = {"individual_scores": {}, "team_scores": {}}
         
         # Configure styles for the UI elements
         style = ttk.Style()
@@ -40,6 +45,7 @@ class TournamentApp:
             ("Manage Teams", self.manage_teams),
             ("Manage Individuals", self.manage_individuals),
             ("Manage Events", self.manage_events),
+            ("Manage Scores", self.manage_scores),
             ("View Data", self.view_data),
             ("Save Data", self.save_data)
         ]
@@ -520,6 +526,214 @@ class TournamentApp:
         ttk.Button(self.button_frame, text="Remove Individual", command=remove_member).pack(pady=5)
         ttk.Button(self.button_frame, text="Assign to Event", command=assign_team_to_event).pack(pady=5)
         ttk.Button(self.button_frame, text="Back to Main Menu", command=self.show_main_menu).pack(pady=5)
+
+    # Add a button to remove scores in 'Manage Scores'
+    def manage_scores(self):
+        self.clear_frame()
+
+        # Add live leaderboard
+        leaderboard_frame = ttk.Frame(self.button_frame)
+        leaderboard_frame.pack(side=tk.LEFT, padx=10, pady=10, fill="y")
+        ttk.Label(leaderboard_frame, text="Leaderboard", font=("Segoe UI", 12, "bold")).pack()
+
+        leaderboard_listbox = tk.Listbox(leaderboard_frame, height=20, width=30)
+        leaderboard_listbox.pack()
+
+        # Populate leaderboard with scores
+        def refresh_leaderboard():
+            leaderboard_listbox.delete(0, tk.END)
+            leaderboard_listbox.insert(tk.END, "Individual Scores:")
+            for individual, score in self.data["scores"]["individual_scores"].items():
+                leaderboard_listbox.insert(tk.END, f"{individual}: {score}")
+
+            leaderboard_listbox.insert(tk.END, "")
+            leaderboard_listbox.insert(tk.END, "Team Scores:")
+            for team, total in self.data["scores"]["team_scores"].items():
+                leaderboard_listbox.insert(tk.END, f"{team}: {total}")
+
+        refresh_leaderboard()
+
+        # Add buttons for score management
+        buttons_frame = ttk.Frame(self.button_frame)
+        buttons_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill="both", expand=True)
+
+        def remove_selected_score():
+            selected = leaderboard_listbox.get(tk.ACTIVE)
+            if selected.startswith("Individual Scores") or selected.startswith("Team Scores") or not selected.strip():
+                messagebox.showerror("Error", "Please select a valid score to delete!")
+                return
+
+            if ":" in selected:
+                name, _ = selected.split(":", 1)
+                name = name.strip()
+                if name in self.data["scores"]["individual_scores"]:
+                    del self.data["scores"]["individual_scores"][name]
+                    messagebox.showinfo("Success", f"Score for individual {name} removed successfully!")
+                elif name in self.data["scores"]["team_scores"]:
+                    del self.data["scores"]["team_scores"][name]
+                    messagebox.showinfo("Success", f"Score for team {name} removed successfully!")
+                else:
+                    messagebox.showerror("Error", "Selected score not found!")
+                refresh_leaderboard()
+
+        buttons = [
+            ("Assign Individual Scores", self.assign_individual_scores),
+            ("Assign Team Member Scores", self.assign_team_member_scores),
+            ("Remove Selected Score", remove_selected_score),
+            ("Calculate Results", self.calculate_results),
+            ("Back to Main Menu", self.show_main_menu)
+        ]
+        for text, command in buttons:
+            btn = ttk.Button(buttons_frame, text=text, command=command, width=25)
+            btn.pack(pady=5)
+
+    # Add leaderboard to 'Assign Individual Scores' and update button functionality
+    def assign_individual_scores(self):
+        self.clear_frame()
+
+        # Add live leaderboard for individual scores
+        leaderboard_frame = ttk.Frame(self.button_frame)
+        leaderboard_frame.pack(side=tk.LEFT, padx=10, pady=10, fill="y")
+        ttk.Label(leaderboard_frame, text="Individual Leaderboard", font=("Segoe UI", 12, "bold")).pack()
+
+        leaderboard_text = Text(leaderboard_frame, height=20, width=30, state=tk.DISABLED)
+        leaderboard_text.pack()
+
+        # Populate leaderboard with individual scores
+        leaderboard_text.config(state=tk.NORMAL)
+        leaderboard_text.delete(1.0, tk.END)
+        leaderboard_text.insert(tk.END, "Individual Scores:\n")
+        for individual, score in self.data["scores"]["individual_scores"].items():
+            leaderboard_text.insert(tk.END, f"{individual}: {score}\n")
+        leaderboard_text.config(state=tk.DISABLED)
+
+        # Add input fields and buttons
+        input_frame = ttk.Frame(self.button_frame)
+        input_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill="both", expand=True)
+
+        ttk.Label(input_frame, text="Select Individual:").pack(pady=5)
+        individual_name_var = StringVar()
+        individual_dropdown = ttk.Combobox(input_frame, textvariable=individual_name_var, values=self.data["individuals"], state="readonly")
+        individual_dropdown.pack(pady=5)
+
+        ttk.Label(input_frame, text="Enter Score (0-100):").pack(pady=5)
+        score_var = StringVar()
+        score_entry = ttk.Entry(input_frame, textvariable=score_var)
+        score_entry.pack(pady=5)
+
+        def confirm_assign_score():
+            individual_name = individual_name_var.get()
+            try:
+                score = int(score_var.get())
+                result = assign_individual_score(self.data, individual_name, score)
+                messagebox.showinfo("Result", result)
+            except ValueError:
+                messagebox.showerror("Error", "Score must be a number between 0 and 100!")
+            self.manage_scores()
+
+        ttk.Button(input_frame, text="Confirm", command=confirm_assign_score).pack(pady=10)
+        ttk.Button(input_frame, text="Back to Manage Scores", command=self.manage_scores).pack(pady=5)
+
+    # Add leaderboard to 'Assign Team Member Scores' and update button functionality
+    def assign_team_member_scores(self):
+        self.clear_frame()
+
+        # Add live leaderboard for team scores
+        leaderboard_frame = ttk.Frame(self.button_frame)
+        leaderboard_frame.pack(side=tk.LEFT, padx=10, pady=10, fill="y")
+        ttk.Label(leaderboard_frame, text="Team Leaderboard", font=("Segoe UI", 12, "bold")).pack()
+
+        leaderboard_text = Text(leaderboard_frame, height=20, width=30, state=tk.DISABLED)
+        leaderboard_text.pack()
+
+        # Populate leaderboard with team scores
+        leaderboard_text.config(state=tk.NORMAL)
+        leaderboard_text.delete(1.0, tk.END)
+        leaderboard_text.insert(tk.END, "Team Scores:\n")
+        for team, total in self.data["scores"]["team_scores"].items():
+            leaderboard_text.insert(tk.END, f"{team}: {total}\n")
+        leaderboard_text.config(state=tk.DISABLED)
+
+        # Add input fields and buttons
+        input_frame = ttk.Frame(self.button_frame)
+        input_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill="both", expand=True)
+
+        ttk.Label(input_frame, text="Select Team:").pack(pady=5)
+        team_name_var = StringVar()
+        team_dropdown = ttk.Combobox(input_frame, textvariable=team_name_var, values=list(self.data["teams"].keys()), state="readonly")
+        team_dropdown.pack(pady=5)
+
+        ttk.Label(input_frame, text="Select Member:").pack(pady=5)
+        member_name_var = StringVar()
+        member_dropdown = ttk.Combobox(input_frame, textvariable=member_name_var, state="readonly")
+        member_dropdown.pack(pady=5)
+
+        def update_members(*args):
+            team_name = team_name_var.get()
+            member_dropdown["values"] = self.data["teams"].get(team_name, [])
+
+        team_name_var.trace("w", update_members)
+
+        ttk.Label(input_frame, text="Enter Score (0-100):").pack(pady=5)
+        score_var = StringVar()
+        score_entry = ttk.Entry(input_frame, textvariable=score_var)
+        score_entry.pack(pady=5)
+
+        def confirm_assign_score():
+            team_name = team_name_var.get()
+            member_name = member_name_var.get()
+            try:
+                score = int(score_var.get())
+                result = assign_team_member_score(self.data, team_name, member_name, score)
+                messagebox.showinfo("Result", result)
+            except ValueError:
+                messagebox.showerror("Error", "Score must be a number between 0 and 100!")
+            self.manage_scores()
+
+        ttk.Button(input_frame, text="Confirm", command=confirm_assign_score).pack(pady=10)
+        ttk.Button(input_frame, text="Back to Manage Scores", command=self.manage_scores).pack(pady=5)
+
+    # Rename the local function to avoid conflict with the global export_results function
+    def calculate_results(self):
+        if not self.data["scores"]["individual_scores"] and not self.data["scores"]["team_scores"]:
+            messagebox.showerror("Error", "No scores entered yet!")
+            return
+
+        results_window = tk.Toplevel(self.root)
+        results_window.title("Results")
+        results_window.geometry("400x400")
+
+        results = determine_winners(self.data)
+
+        result_text = Text(results_window, height=20, width=50)
+        result_text.pack(padx=10, pady=10)
+        result_text.insert(tk.END, "Individual Scores:\n")
+        for individual, score in results["individual_scores"].items():
+            result_text.insert(tk.END, f"{individual}: {score}\n")
+
+        result_text.insert(tk.END, "\nTeam Scores:\n")
+        for team, total in results["team_totals"].items():
+            result_text.insert(tk.END, f"{team}: {total['average_score']}\n")
+            for member, score in total["members"].items():
+                result_text.insert(tk.END, f"  {member}: {score}\n")
+
+        result_text.insert(tk.END, "\nWinners:\n")
+        result_text.insert(tk.END, f"Individual Winner: {results['individual_winner']}\n")
+        result_text.insert(tk.END, f"Team Winner: {results['team_winner']}\n")
+        result_text.config(state=tk.DISABLED)
+
+        def save_results():
+            file_path = filedialog.asksaveasfilename(
+                initialfile="EventWiz-results.txt",
+                defaultextension=".txt",
+                filetypes=[("Text files", "*.txt")]
+            )
+            if file_path:
+                result = export_results(self.data, file_path)
+                messagebox.showinfo("Export Results", result)
+
+        ttk.Button(results_window, text="Export Results", command=save_results).pack(pady=10)
+        ttk.Button(results_window, text="Close", command=results_window.destroy).pack(pady=5)
 
 if __name__ == "__main__":
     root = tk.Tk()

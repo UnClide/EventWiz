@@ -7,6 +7,10 @@ initial_data = {
     "events": {
         "team_events": {},
         "individual_events": {}
+    },
+    "scores": {
+        "individual_scores": {},
+        "team_scores": {}
     }
 }
 
