@@ -1,4 +1,5 @@
-# Tournament Scoring System
+<p align="center"><img src="https://images.icon-icons.com/3687/PNG/512/wizard_crystal_witch_magicball_halloween_icon_229373.png"/ width=128></p>
+<h1 align="center">EventWiz - Tournament Scoring System</h1>
 
 ## Overview
 This project is a **Tournament Scoring System**, developed as part of a college assignment. The application provides an easy-to-use interface for managing teams, individuals, and events, while also calculating scores to determine the winner.
@@ -17,7 +18,7 @@ This project is a **Tournament Scoring System**, developed as part of a college 
 
 ## Installation
 **1. Run using executable file**
-- Download the latest version of `EventWiz.exe` from **Releases** and run it to proceed.
+- Download the latest version of `EventWiz.exe` from [Releases](https://github.com/UnClide/EventWiz/releases) and run it to proceed.
 
 **2. Run using Python**
 1. Install Python (if not already installed).
