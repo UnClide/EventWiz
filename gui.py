@@ -8,6 +8,16 @@ from individual_management import add_individual, delete_individual, assign_indi
 from event_management import add_event, delete_event, change_event_type, update_event_names, remove_individual_from_event
 from scoring_management import assign_individual_score, assign_team_member_score, determine_winners, export_results
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 class TournamentApp:
     def __init__(self, root):
         self.root = root
